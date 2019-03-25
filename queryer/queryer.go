@@ -23,9 +23,12 @@ func init() {
 
 // Queryer allows for various HTTP queries to different servers.
 type Queryer struct {
-	privmsgHandlerID uint64
-	googleHandlerID  uint64
-	calcHandlerID    uint64
+	youtubeID       uint64
+	googleHandlerID uint64
+	calcHandlerID   uint64
+	yrID            uint64
+	shortenID       uint64
+	githubID        uint64
 }
 
 // Init the extension
@@ -37,7 +40,7 @@ func (q *Queryer) Init(b *bot.Bot) error {
 	}
 
 	var err error
-	q.privmsgHandlerID = b.Register("", "", irc.PRIVMSG, q)
+	q.youtubeID = b.Register("", "", irc.PRIVMSG, q)
 	q.googleHandlerID, err = b.RegisterCmd("", "", cmd.New(
 		"query",
 		"google",
@@ -58,15 +61,48 @@ func (q *Queryer) Init(b *bot.Bot) error {
 	if err != nil {
 		return err
 	}
+	q.yrID, err = b.RegisterCmd("", "", cmd.New(
+		"query",
+		"yr",
+		"Get weather from norway based sources",
+		q,
+		cmd.Privmsg, cmd.AnyScope, "query...",
+	))
+	if err != nil {
+		return err
+	}
+	q.shortenID, err = b.RegisterCmd("", "", cmd.New(
+		"query",
+		"shorten",
+		"Shorten a URL with the goo.gl url shortener",
+		q,
+		cmd.Privmsg, cmd.AnyScope, "query...",
+	))
+	if err != nil {
+		return err
+	}
+	q.githubID, err = b.RegisterCmd("", "", cmd.New(
+		"query",
+		"stars",
+		"Count the number of stars a user or repo has on github",
+		q,
+		cmd.Privmsg, cmd.AnyScope, "userorrepo",
+	))
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
 
 // Deinit the extension
 func (q *Queryer) Deinit(b *bot.Bot) error {
-	b.Unregister(q.privmsgHandlerID)
+	b.Unregister(q.youtubeID)
 	b.UnregisterCmd(q.googleHandlerID)
 	b.UnregisterCmd(q.calcHandlerID)
+	b.UnregisterCmd(q.yrID)
+	b.UnregisterCmd(q.shortenID)
+	b.UnregisterCmd(q.githubID)
 	return nil
 }
 
@@ -124,6 +160,51 @@ func (Queryer) Google(w irc.Writer, ev *cmd.Event) error {
 		w.Notify(ev.Event, nick, out)
 	} else if err != nil {
 		w.Notice(nick, err.Error())
+	}
+
+	return nil
+}
+
+// Yr weather for norway based residents
+func (Queryer) Yr(w irc.Writer, ev *cmd.Event) error {
+	q := ev.Args["query"]
+	nick := ev.Nick()
+
+	if out, err := query.WeatherYR(q, queryConf); len(out) != 0 {
+		out = sanitize(out)
+		w.Notify(ev.Event, nick, out)
+	} else if err != nil {
+		w.Notice(nick, err.Error())
+	}
+
+	return nil
+}
+
+// Shorten a url
+func (Queryer) Shorten(w irc.Writer, ev *cmd.Event) error {
+	q := ev.Args["query"]
+	nick := ev.Nick()
+
+	if out, err := query.GetShortURL(q, queryConf); len(out) != 0 {
+		w.Notifyf(ev.Event, nick, "\x02Shorten:\x02 %s", sanitize(out))
+	} else if err != nil {
+		w.Notice(nick, err.Error())
+	}
+
+	return nil
+}
+
+// Stars counts github stars
+func (Queryer) Stars(w irc.Writer, ev *cmd.Event) error {
+	q := ev.Args["userorrepo"]
+	nick := ev.Nick()
+
+	if out, err := query.GithubStars(q, queryConf); err != nil {
+		w.Notice(nick, err.Error())
+	} else if out != 0 {
+		w.Notifyf(ev.Event, nick, "\x02Github stars (%s):\x02 %d", strings.ToLower(q), out)
+	} else {
+		w.Notify(ev.Event, nick, "\x02Github stars:\x02 could not find repo %s", strings.ToLower(q))
 	}
 
 	return nil

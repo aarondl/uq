@@ -6,13 +6,17 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aarondl/cinotify"
 	"github.com/aarondl/ultimateq/bot"
+	"github.com/aarondl/ultimateq/config"
 	"github.com/aarondl/ultimateq/irc"
 
 	_ "github.com/aarondl/uq/basics"
 	_ "github.com/aarondl/uq/queryer"
 	_ "github.com/aarondl/uq/quoter"
 	_ "github.com/aarondl/uq/runner"
+
+	_ "github.com/knivey/gitbot"
 )
 
 // Handler extension
@@ -33,7 +37,26 @@ func main() {
 	h := &Handler{}
 
 	err := bot.Run(func(b *bot.Bot) {
+		var cinotifyNet, cinotifyChan string
+		b.ReadConfig(func(cfg *config.Config) {
+			cinotifyNet, _ = cfg.ExtGlobal().ConfigVal("", "", "cinotify_network")
+			cinotifyChan, _ = cfg.ExtGlobal().ConfigVal("", "", "cinotify_channel")
+		})
+
 		b.Register("", "", irc.PRIVMSG, h)
+
+		if len(cinotifyNet) != 0 && len(cinotifyChan) != 0 {
+			cinotify.ToFunc(func(name string, notification fmt.Stringer) {
+				writer := b.NetworkWriter(cinotifyNet)
+				if writer == nil {
+					return
+				}
+
+				writer.Privmsgln(cinotifyChan, notification)
+			})
+		}
+
+		cinotify.StartServer(5000)
 	})
 
 	if err != nil {

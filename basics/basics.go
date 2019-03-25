@@ -2,7 +2,6 @@ package basics
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/aarondl/ultimateq/bot"
 	"github.com/aarondl/ultimateq/data"
@@ -21,6 +20,7 @@ type Handler struct {
 	privmsgHandlerID uint64
 	joinHandlerID    uint64
 	opID             uint64
+	pingID           uint64
 }
 
 // Init the extension
@@ -37,8 +37,21 @@ func (h *Handler) Init(b *bot.Bot) error {
 		h,
 		cmd.Privmsg, cmd.AnyScope, 0, "", "#chan",
 	))
+	if err != nil {
+		return err
+	}
+	h.pingID, err = b.RegisterCmd("", "", cmd.New(
+		"basics",
+		"ping",
+		"Responds to ping commands",
+		h,
+		cmd.Privmsg, cmd.AnyScope,
+	))
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }
 
 // Deinit the extension
@@ -46,6 +59,7 @@ func (h *Handler) Deinit(b *bot.Bot) error {
 	b.Unregister(h.joinHandlerID)
 	b.Unregister(h.privmsgHandlerID)
 	b.UnregisterCmd(h.opID)
+	b.UnregisterCmd(h.pingID)
 	return nil
 }
 
@@ -54,9 +68,15 @@ func (*Handler) Cmd(string, irc.Writer, *cmd.Event) error {
 	return nil
 }
 
+// Ping from a user, let's pong
+func (h *Handler) Ping(w irc.Writer, ev *cmd.Event) error {
+	nick := ev.Nick()
+	w.Notifyf(ev.Event, nick, "\x02%s:\x02 pong!", nick)
+	return nil
+}
+
 // Up lets a user with proper access voice/op themselves.
 func (h *Handler) Up(w irc.Writer, ev *cmd.Event) error {
-	fmt.Println("at least it's happening?")
 	user := ev.StoredUser
 	ch := ev.TargetChannel
 	if ch == nil {
@@ -65,7 +85,6 @@ func (h *Handler) Up(w irc.Writer, ev *cmd.Event) error {
 	chname := ch.Name
 
 	if !putPeopleUp(ev.Event, chname, user, w) {
-		fmt.Println("an error is occurring!")
 		return dispatch.MakeFlagsError("ov")
 	}
 	return nil
