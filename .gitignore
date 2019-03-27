@@ -2,3 +2,4 @@
 *.toml
 *.db
 *.sqlite3
+./uq
