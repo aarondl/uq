@@ -46,6 +46,7 @@ func main() {
 		b.Register("", "", irc.PRIVMSG, h)
 
 		if len(cinotifyNet) != 0 && len(cinotifyChan) != 0 {
+			b.Logger.Info("cinotify", "net", cinotifyNet, "chan", cinotifyChan)
 			cinotify.ToFunc(func(name string, notification fmt.Stringer) {
 				writer := b.NetworkWriter(cinotifyNet)
 				if writer == nil {

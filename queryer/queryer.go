@@ -155,7 +155,7 @@ func (Queryer) Google(w irc.Writer, ev *cmd.Event) error {
 	q := ev.Args["query"]
 	nick := ev.Nick()
 
-	if out, err := query.Google(q, queryConf); len(out) != 0 {
+	if out, err := query.Bing(q, queryConf); len(out) != 0 {
 		out = sanitize(out)
 		w.Notify(ev.Event, nick, out)
 	} else if err != nil {
