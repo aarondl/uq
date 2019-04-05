@@ -51,6 +51,16 @@ func (q *Queryer) Init(b *bot.Bot) error {
 	if err != nil {
 		return err
 	}
+	q.googleHandlerID, err = b.RegisterCmd("", "", cmd.New(
+		"query",
+		"bing",
+		"Submits a query to Bing.",
+		q,
+		cmd.Privmsg, cmd.AnyScope, "query...",
+	))
+	if err != nil {
+		return err
+	}
 	q.calcHandlerID, err = b.RegisterCmd("", "", cmd.New(
 		"query",
 		"calc",
@@ -152,6 +162,21 @@ func (Queryer) Calc(w irc.Writer, ev *cmd.Event) error {
 
 // Google some query and return the first result
 func (Queryer) Google(w irc.Writer, ev *cmd.Event) error {
+	q := ev.Args["query"]
+	nick := ev.Nick()
+
+	if out, err := query.Google(q, queryConf); len(out) != 0 {
+		out = sanitize(out)
+		w.Notify(ev.Event, nick, out)
+	} else if err != nil {
+		w.Notice(nick, err.Error())
+	}
+
+	return nil
+}
+
+// Bing some query and return the first result
+func (Queryer) Bing(w irc.Writer, ev *cmd.Event) error {
 	q := ev.Args["query"]
 	nick := ev.Nick()
 
