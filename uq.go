@@ -2,6 +2,7 @@ package main // import "github.com/aarondl/uq"
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"strings"
 	"time"
@@ -31,6 +32,15 @@ func (h *Handler) Handle(w irc.Writer, ev *irc.Event) {
 	}
 }
 
+type ciLogger struct {
+	b *bot.Bot
+}
+
+func (c ciLogger) Write(msg []byte) (int, error) {
+	c.b.Logger.Error(string(msg))
+	return len(msg), nil
+}
+
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
@@ -46,6 +56,8 @@ func main() {
 		b.Register("", "", irc.PRIVMSG, h)
 
 		if len(cinotifyNet) != 0 && len(cinotifyChan) != 0 {
+			cinotify.Logger = log.New(ciLogger{b: b}, "", 0)
+
 			b.Logger.Info("cinotify", "net", cinotifyNet, "chan", cinotifyChan)
 			cinotify.ToFunc(func(name string, notification fmt.Stringer) {
 				writer := b.NetworkWriter(cinotifyNet)
