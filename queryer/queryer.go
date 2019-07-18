@@ -128,7 +128,7 @@ func (q Queryer) Handle(w irc.Writer, ev *irc.Event) {
 		return
 	}
 
-	if out, err := query.YouTube(ev.Message()); len(out) != 0 {
+	if out, err := query.YouTube(ev.Message(), queryConf); len(out) != 0 {
 		w.Privmsg(ev.Target(), out)
 	} else if err != nil {
 		nick := ev.Nick()
