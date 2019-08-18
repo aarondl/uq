@@ -1,8 +1,9 @@
 package quoter
 
 import (
+	"database/sql"
 	"strconv"
-	"time"
+	"strings"
 
 	"github.com/aarondl/quotes"
 	"github.com/aarondl/ultimateq/bot"
@@ -15,11 +16,17 @@ const (
 )
 
 func init() {
-	bot.RegisterExtension("quoter", &Quoter{})
+	bot.RegisterExtension("quoter", &Quoter{
+		Listen:    ":8000",
+		ServerURI: "https://quotes.bitforge.ca",
+	})
 }
 
 // Quoter extension
 type Quoter struct {
+	Listen    string
+	ServerURI string
+
 	db *quotes.QuoteDB
 
 	quoteID     uint64
@@ -29,6 +36,9 @@ type Quoter struct {
 	delQuoteID  uint64
 	editQuoteID uint64
 	quoteWebID  uint64
+	upvoteID    uint64
+	downvoteID  uint64
+	unvoteID    uint64
 }
 
 // Cmd lets reflection hook up the commands, instead of doing it here.
@@ -44,7 +54,7 @@ func (q *Quoter) Init(b *bot.Bot) error {
 	}
 
 	q.db = qdb
-	qdb.StartServer(":8000")
+	qdb.StartServer(q.Listen)
 
 	q.quoteID, err = b.RegisterCmd("", "", cmd.New(
 		"quote",
@@ -116,6 +126,39 @@ func (q *Quoter) Init(b *bot.Bot) error {
 	if err != nil {
 		return nil
 	}
+	q.upvoteID, err = b.RegisterCmd("", "", cmd.New(
+		"quote",
+		"up",
+		"Upvotes a quote",
+		q,
+		cmd.Privmsg, cmd.AnyScope,
+		"id",
+	))
+	if err != nil {
+		return nil
+	}
+	q.downvoteID, err = b.RegisterCmd("", "", cmd.New(
+		"quote",
+		"down",
+		"Downvotes a quote",
+		q,
+		cmd.Privmsg, cmd.AnyScope,
+		"id",
+	))
+	if err != nil {
+		return nil
+	}
+	q.unvoteID, err = b.RegisterCmd("", "", cmd.New(
+		"quote",
+		"unvote",
+		"Unvotes a quote",
+		q,
+		cmd.Privmsg, cmd.AnyScope,
+		"id",
+	))
+	if err != nil {
+		return nil
+	}
 
 	return nil
 }
@@ -130,6 +173,9 @@ func (q *Quoter) Deinit(b *bot.Bot) error {
 	b.UnregisterCmd(q.delQuoteID)
 	b.UnregisterCmd(q.editQuoteID)
 	b.UnregisterCmd(q.quoteWebID)
+	b.UnregisterCmd(q.upvoteID)
+	b.UnregisterCmd(q.downvoteID)
+	b.UnregisterCmd(q.unvoteID)
 
 	return nil
 }
@@ -146,8 +192,14 @@ func (q *Quoter) Addquote(w irc.Writer, ev *cmd.Event) error {
 	if err != nil {
 		w.Noticef(nick, "\x02Quote:\x02 %v", err)
 	} else {
-		w.Noticef(nick, "\x02Quote:\x02 Added quote #%d", id)
+		w.Notifyf(ev.Event, nick, "\x02Quote:\x02 Added quote #%d", id)
 	}
+
+	if id != 0 && strings.HasPrefix(strings.ToLower(nick), "scott") {
+		// Don't care if this fails
+		_, _ = q.db.Downvote(int(id), "autodown")
+	}
+
 	return nil
 }
 
@@ -199,7 +251,7 @@ func (q *Quoter) Quote(w irc.Writer, ev *cmd.Event) error {
 	strid := ev.Args["id"]
 	nick := ev.Nick()
 
-	var quote string
+	var quote quotes.Quote
 	var id int
 	var err error
 	if len(strid) > 0 {
@@ -211,18 +263,22 @@ func (q *Quoter) Quote(w irc.Writer, ev *cmd.Event) error {
 		}
 		quote, err = q.db.GetQuote(id)
 	} else {
-		id, quote, err = q.db.RandomQuote()
+		quote, err = q.db.RandomQuote()
 	}
 	if err != nil {
+		if err == sql.ErrNoRows {
+			w.Notice(nick, "\x02Quote:\x02 No quotes to display.")
+			return nil
+		}
 		w.Noticef(nick, "\x02Quote:\x02 %v", err)
 		return nil
 	}
 
-	if len(quote) == 0 {
+	if len(quote.Quote) == 0 {
 		w.Notify(ev.Event, nick, "\x02Quote:\x02 Does not exist.")
 	} else {
-		w.Notifyf(ev.Event, nick, "\x02Quote (\x02#%d\x02):\x02 %s",
-			id, quote)
+		w.Notifyf(ev.Event, nick, "\x02Quote (\x02#%d|%+d\x02):\x02 %s",
+			quote.ID, quote.Upvotes-quote.Downvotes, quote.Quote)
 	}
 	return nil
 }
@@ -246,12 +302,17 @@ func (q *Quoter) Details(w irc.Writer, ev *cmd.Event) error {
 		return nil
 	}
 
-	if date, author, err := q.db.GetDetails(int(id)); err != nil {
-		w.Noticef(nick, "\x02Quote:\x02 %v", err)
+	if quote, err := q.db.GetQuote(int(id)); err != nil {
+		w.Noticef(nick, "\x02Quote:\x02 error %v", err)
 	} else {
 		w.Notifyf(ev.Event, nick,
-			"\x02Quote (\x02#%d\x02):\x02 Created on %s by %s",
-			id, time.Unix(date, 0).UTC().Format(dateFormat), author)
+			"\x02Quote (\x02#%d\x02):\x02 Created on %s by %s, %d upvote(s), %d downvote(s)",
+			id,
+			quote.Date.UTC().Format(dateFormat),
+			quote.Author,
+			quote.Upvotes,
+			quote.Downvotes,
+		)
 	}
 
 	return nil
@@ -259,6 +320,85 @@ func (q *Quoter) Details(w irc.Writer, ev *cmd.Event) error {
 
 // Quoteweb provides a server to see the quotes
 func (q *Quoter) Quoteweb(w irc.Writer, ev *cmd.Event) error {
-	w.Notify(ev.Event, ev.Nick(), "\x02Quote:\x02 http://bitforge.ca:8000")
+	if len(q.ServerURI) == 0 {
+		w.Notify(ev.Event, ev.Nick(), "\x02Quote:\x02 No quote server running")
+		return nil
+	}
+	w.Notify(ev.Event, ev.Nick(), "\x02Quote:\x02 "+q.ServerURI)
+	return nil
+}
+
+// Up vote a quote
+func (q *Quoter) Up(w irc.Writer, ev *cmd.Event) error {
+	nick := ev.Nick()
+	id, err := strconv.Atoi(ev.Args["id"])
+
+	if err != nil {
+		w.Notice(nick, "\x02Quote:\x02 Not a valid id.")
+		return nil
+	}
+
+	voter := strings.ToLower(nick)
+	did, err := q.db.Upvote(id, voter)
+	if err != nil {
+		w.Noticef(nick, "\x02Quote:\x02 Error attempting to upvote: %v", err)
+		return nil
+	} else if !did {
+		w.Noticef(nick, "\x02Quote:\x02 You have already upvoted quote #%d", id)
+	} else {
+		w.Noticef(nick, "\x02Quote:\x02 Upvoted quote #%d", id)
+		return nil
+	}
+
+	return nil
+}
+
+// Down vote a quote
+func (q *Quoter) Down(w irc.Writer, ev *cmd.Event) error {
+	nick := ev.Nick()
+	id, err := strconv.Atoi(ev.Args["id"])
+
+	if err != nil {
+		w.Notice(nick, "\x02Quote:\x02 Not a valid id.")
+		return nil
+	}
+
+	voter := strings.ToLower(nick)
+	did, err := q.db.Downvote(id, voter)
+	if err != nil {
+		w.Noticef(nick, "\x02Quote:\x02 Error attempting to upvote: %v", err)
+		return nil
+	} else if !did {
+		w.Noticef(nick, "\x02Quote:\x02 You have already downvoted quote #%d", id)
+	} else {
+		w.Noticef(nick, "\x02Quote:\x02 Downvoted quote #%d", id)
+		return nil
+	}
+
+	return nil
+}
+
+// Unvote vote a quote
+func (q *Quoter) Unvote(w irc.Writer, ev *cmd.Event) error {
+	nick := ev.Nick()
+	id, err := strconv.Atoi(ev.Args["id"])
+
+	if err != nil {
+		w.Notice(nick, "\x02Quote:\x02 Not a valid id.")
+		return nil
+	}
+
+	voter := strings.ToLower(nick)
+	did, err := q.db.Unvote(id, voter)
+	if err != nil {
+		w.Noticef(nick, "\x02Quote:\x02 Error attempting to upvote: %v", err)
+		return nil
+	} else if !did {
+		w.Noticef(nick, "\x02Quote:\x02 You have not voted on quote #%d", id)
+	} else {
+		w.Noticef(nick, "\x02Quote:\x02 Unvoted quote #%d", id)
+		return nil
+	}
+
 	return nil
 }

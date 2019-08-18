@@ -32,7 +32,7 @@ func (h *Handler) Init(b *bot.Bot) error {
 	var err error
 	h.opID, err = b.RegisterCmd("", "", cmd.NewAuthed(
 		"basics",
-		"up",
+		"upme",
 		"Ops or voices a user if they have o or v flags respectively.",
 		h,
 		cmd.Privmsg, cmd.AnyScope, 0, "", "#chan",
