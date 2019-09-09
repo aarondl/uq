@@ -20,6 +20,8 @@ github.com/bradj/remindme v0.0.0-20190909000406-9311555a24ff h1:q2rQwIb+4UVnsqW1
 github.com/bradj/remindme v0.0.0-20190909000406-9311555a24ff/go.mod h1:ULSQfPeqhGkf9UyL3mO7ULvXOV5dQtugtme4th5DRuM=
 github.com/bradj/remindme v0.0.0-20190909012259-50bcf8ecae1d h1:XN9uGnXfX1bGvoeD2CnIUzIlud5ThJPzMa3Fkw4seMA=
 github.com/bradj/remindme v0.0.0-20190909012259-50bcf8ecae1d/go.mod h1:ULSQfPeqhGkf9UyL3mO7ULvXOV5dQtugtme4th5DRuM=
+github.com/bradj/remindme v0.1.0 h1:PlD12k92EZ4T7mrwdDxgnIBl4NhefT9l/LUeIbReSn4=
+github.com/bradj/remindme v0.1.0/go.mod h1:ULSQfPeqhGkf9UyL3mO7ULvXOV5dQtugtme4th5DRuM=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cznic/fileutil v0.0.0-20181122101858-4d67cfea8c87 h1:94XgeeTZ+3Xi9zsdgBjP1Byx/wywCImjF8FzQ7OaKdU=
 github.com/cznic/fileutil v0.0.0-20181122101858-4d67cfea8c87/go.mod h1:8S58EK26zhXSxzv7NQFpnliaOQsmDUxvoQO3rt154Vg=

@@ -9,7 +9,7 @@ require (
 	github.com/aarondl/query v0.0.0-20190718223540-4829429e162f
 	github.com/aarondl/quotes v0.0.0-20190818220714-60c5c9f7faf4
 	github.com/aarondl/ultimateq v0.0.0-20190718005121-c8d92ea565f1
-	github.com/bradj/remindme v0.0.0-20190909012259-50bcf8ecae1d
+	github.com/bradj/remindme v0.1.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/protobuf v1.3.2
 	github.com/google/go-github v17.0.0+incompatible // indirect
