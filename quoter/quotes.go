@@ -195,11 +195,6 @@ func (q *Quoter) Addquote(w irc.Writer, ev *cmd.Event) error {
 		w.Notifyf(ev.Event, nick, "\x02Quote:\x02 Added quote #%d", id)
 	}
 
-	if id != 0 && strings.HasPrefix(strings.ToLower(nick), "scott") {
-		// Don't care if this fails
-		_, _ = q.db.Downvote(int(id), "autodown")
-	}
-
 	return nil
 }
 
