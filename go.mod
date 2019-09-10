@@ -8,7 +8,7 @@ require (
 	github.com/aarondl/gitio v0.0.0-20190619182233-9427fbcd5b47 // indirect
 	github.com/aarondl/query v0.0.0-20190718223540-4829429e162f
 	github.com/aarondl/quotes v0.0.0-20190818220714-60c5c9f7faf4
-	github.com/aarondl/ultimateq v0.0.0-20190718005121-c8d92ea565f1
+	github.com/aarondl/ultimateq v0.0.0-20190910020858-27f5e6591bb4
 	github.com/bradj/remindme v0.1.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/golang/protobuf v1.3.2

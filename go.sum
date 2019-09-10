@@ -14,6 +14,8 @@ github.com/aarondl/quotes v0.0.0-20190818220714-60c5c9f7faf4 h1:U6+NUHvNq2k7hASe
 github.com/aarondl/quotes v0.0.0-20190818220714-60c5c9f7faf4/go.mod h1:Lb2F+wCRft/cVzoyGt4oLROtjtg/KuhPxPfjVYwO914=
 github.com/aarondl/ultimateq v0.0.0-20190718005121-c8d92ea565f1 h1:vqImKS5UCX8E+puhJTs3STY4BWmj0qG9lENZ3E6jtm0=
 github.com/aarondl/ultimateq v0.0.0-20190718005121-c8d92ea565f1/go.mod h1:HI1k+w4bk7fKsRWiXG5S2x7uBh6wOUiFUNT0K5f5/a0=
+github.com/aarondl/ultimateq v0.0.0-20190910020858-27f5e6591bb4 h1:0ycATxzKN3Apg6obFdfz0yc5h2yuU4btO7//j2cw5L0=
+github.com/aarondl/ultimateq v0.0.0-20190910020858-27f5e6591bb4/go.mod h1:HI1k+w4bk7fKsRWiXG5S2x7uBh6wOUiFUNT0K5f5/a0=
 github.com/bradj/remindme v0.0.0-20190908131951-5dee46dbd1fc h1:Z+pVs1VWgWMSvWLrViJS3LB3Vm4GCVyakLydQa+7ZkM=
 github.com/bradj/remindme v0.0.0-20190908131951-5dee46dbd1fc/go.mod h1:yvk0iV1BLJbFJPDrj+jnARiunfS0aaJgoJZQUBZZWqw=
 github.com/bradj/remindme v0.0.0-20190909000406-9311555a24ff h1:q2rQwIb+4UVnsqW1WKYgXxrzgSfnkt6UthF2cGBpbng=
