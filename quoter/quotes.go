@@ -338,7 +338,8 @@ func (q *Quoter) Up(w irc.Writer, ev *cmd.Event) error {
 		return nil
 	}
 
-	voter := strings.ToLower(nick)
+	_, user, host := ev.Event.SplitHost()
+	voter := strings.ToLower(user + "@" + host)
 	did, err := q.db.Upvote(id, voter)
 	if err != nil {
 		w.Noticef(nick, "\x02Quote:\x02 Error attempting to upvote: %v", err)
@@ -363,7 +364,8 @@ func (q *Quoter) Down(w irc.Writer, ev *cmd.Event) error {
 		return nil
 	}
 
-	voter := strings.ToLower(nick)
+	_, user, host := ev.Event.SplitHost()
+	voter := strings.ToLower(user + "@" + host)
 	did, err := q.db.Downvote(id, voter)
 	if err != nil {
 		w.Noticef(nick, "\x02Quote:\x02 Error attempting to upvote: %v", err)
@@ -388,7 +390,8 @@ func (q *Quoter) Unvote(w irc.Writer, ev *cmd.Event) error {
 		return nil
 	}
 
-	voter := strings.ToLower(nick)
+	_, user, host := ev.Event.SplitHost()
+	voter := strings.ToLower(user + "@" + host)
 	did, err := q.db.Unvote(id, voter)
 	if err != nil {
 		w.Noticef(nick, "\x02Quote:\x02 Error attempting to upvote: %v", err)
