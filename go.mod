@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/Islandstone/yr v0.0.0-20140612205943-1c29d5159423 // indirect
-	github.com/aarondl/cinotify v0.0.0-20150328181948-1b78a2595522
+	github.com/aarondl/cinotify v0.0.0-20190916083921-ecf31a35e707
 	github.com/aarondl/gitio v0.0.0-20190619182233-9427fbcd5b47 // indirect
 	github.com/aarondl/query v0.0.0-20190718223540-4829429e162f
 	github.com/aarondl/quotes v0.0.0-20190818220714-60c5c9f7faf4

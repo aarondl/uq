@@ -6,6 +6,8 @@ github.com/Islandstone/yr v0.0.0-20140612205943-1c29d5159423 h1:VVyvt04n5NH5bBiT
 github.com/Islandstone/yr v0.0.0-20140612205943-1c29d5159423/go.mod h1:NhvLRYD47hQjIe9GYgkfMvKXByO6BDCVTk4xV9gxeuA=
 github.com/aarondl/cinotify v0.0.0-20150328181948-1b78a2595522 h1:RQJuRjqIvp1VvxPhF2WDV4bZ/QmfZbSWVW7KzACphIM=
 github.com/aarondl/cinotify v0.0.0-20150328181948-1b78a2595522/go.mod h1:WSGWwwfRyjPFj3wS+J2uLl5/1c2o0UiKTGgxQzIEhg8=
+github.com/aarondl/cinotify v0.0.0-20190916083921-ecf31a35e707 h1:aKSxgHUfBwnrW9Q9FpEvB6QP4CzmLkd3wppeF0yK8Oc=
+github.com/aarondl/cinotify v0.0.0-20190916083921-ecf31a35e707/go.mod h1:WSGWwwfRyjPFj3wS+J2uLl5/1c2o0UiKTGgxQzIEhg8=
 github.com/aarondl/gitio v0.0.0-20190619182233-9427fbcd5b47 h1:58jh8xUqI8EQX1iUpyD34HroFhE6CZM4qMqqvgyXl7E=
 github.com/aarondl/gitio v0.0.0-20190619182233-9427fbcd5b47/go.mod h1:BONW3k+zEl7B92IYRjY/AkR7zBYeoR9yP5A54P/3bk4=
 github.com/aarondl/query v0.0.0-20190718223540-4829429e162f h1:bfXlokNP189hfKFycunp6z/Axg007i9OYtqrd8vEy1A=
