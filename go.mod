@@ -15,7 +15,7 @@ require (
 	github.com/google/go-github v17.0.0+incompatible // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/gorilla/mux v1.7.3 // indirect
-	github.com/knivey/gitbot v0.0.0-20190620001058-e45c8cbdddb2
+	github.com/knivey/gitbot v0.0.0-20190916135406-365affbcbf5c
 	github.com/mattn/go-sqlite3 v1.11.0 // indirect
 	golang.org/x/net v0.0.0-20190827160401-ba9fcec4b297 // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45 // indirect
