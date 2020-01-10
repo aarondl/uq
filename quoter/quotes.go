@@ -31,7 +31,7 @@ type Quoter struct {
 
 	quoteID     uint64
 	quotesID    uint64
-	detailsID   uint64
+	infoID      uint64
 	addQuoteID  uint64
 	delQuoteID  uint64
 	editQuoteID uint64
@@ -76,9 +76,9 @@ func (q *Quoter) Init(b *bot.Bot) error {
 	if err != nil {
 		return nil
 	}
-	q.detailsID, err = b.RegisterCmd("", "", cmd.New(
+	q.infoID, err = b.RegisterCmd("", "", cmd.New(
 		"quote",
-		"details",
+		"info",
 		"Gets the details for a specific quote.",
 		q,
 		cmd.Privmsg, cmd.AnyScope, "id",
@@ -168,7 +168,7 @@ func (q *Quoter) Deinit(b *bot.Bot) error {
 	defer q.db.Close()
 
 	b.UnregisterCmd(q.quotesID)
-	b.UnregisterCmd(q.detailsID)
+	b.UnregisterCmd(q.infoID)
 	b.UnregisterCmd(q.addQuoteID)
 	b.UnregisterCmd(q.delQuoteID)
 	b.UnregisterCmd(q.editQuoteID)
@@ -287,8 +287,8 @@ func (q *Quoter) Quotes(w irc.Writer, ev *cmd.Event) error {
 	return nil
 }
 
-// Details provides more detail on a given quote
-func (q *Quoter) Details(w irc.Writer, ev *cmd.Event) error {
+// Info provides more detail on a given quote
+func (q *Quoter) Info(w irc.Writer, ev *cmd.Event) error {
 	nick := ev.Nick()
 	id, err := strconv.Atoi(ev.Args["id"])
 
