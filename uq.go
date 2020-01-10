@@ -16,7 +16,6 @@ import (
 	_ "github.com/aarondl/uq/queryer"
 	_ "github.com/aarondl/uq/quoter"
 	_ "github.com/aarondl/uq/reminder"
-	_ "github.com/aarondl/uq/runner"
 
 	_ "github.com/knivey/gitbot"
 )
