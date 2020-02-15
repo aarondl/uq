@@ -7,7 +7,7 @@ require (
 	github.com/aarondl/cinotify v0.0.0-20190916083921-ecf31a35e707
 	github.com/aarondl/gitio v0.0.0-20190619182233-9427fbcd5b47 // indirect
 	github.com/aarondl/query v0.0.0-20190718223540-4829429e162f
-	github.com/aarondl/quotes v0.0.0-20200215213135-508432773ccc
+	github.com/aarondl/quotes v0.0.0-20200215214115-f29ae13ae3d5
 	github.com/aarondl/ultimateq v0.0.0-20190910020858-27f5e6591bb4
 	github.com/bradj/remindme v0.1.0
 	github.com/davecgh/go-spew v1.1.1 // indirect
