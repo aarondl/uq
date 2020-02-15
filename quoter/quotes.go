@@ -2,11 +2,14 @@ package quoter
 
 import (
 	"database/sql"
+	"fmt"
+	"net/url"
 	"strconv"
 	"strings"
 
 	"github.com/aarondl/quotes"
 	"github.com/aarondl/ultimateq/bot"
+	"github.com/aarondl/ultimateq/config"
 	"github.com/aarondl/ultimateq/dispatch/cmd"
 	"github.com/aarondl/ultimateq/irc"
 )
@@ -16,16 +19,14 @@ const (
 )
 
 func init() {
-	bot.RegisterExtension("quoter", &Quoter{
-		Listen:    ":8000",
-		ServerURI: "https://quotes.bitforge.ca",
-	})
+	bot.RegisterExtension("quoter", new(Quoter))
 }
 
 // Quoter extension
 type Quoter struct {
-	Listen    string
-	ServerURI string
+	WebListen    string
+	WebServerURL *url.URL
+	WebAuth      string
 
 	db *quotes.QuoteDB
 
@@ -48,13 +49,39 @@ func (q *Quoter) Cmd(_ string, _ irc.Writer, _ *cmd.Event) error {
 
 // Init the extension
 func (q *Quoter) Init(b *bot.Bot) error {
-	qdb, err := quotes.OpenDB("quotes.sqlite3")
+	var uri string
+	b.ReadConfig(func(cfg *config.Config) {
+		q.WebListen, _ = cfg.ExtGlobal().ConfigVal("", "", "quoteweb_listen")
+		uri, _ = cfg.ExtGlobal().ConfigVal("", "", "quoteweb_url")
+		q.WebAuth, _ = cfg.ExtGlobal().ConfigVal("", "", "quoteweb_auth")
+	})
+
+	if len(uri) != 0 {
+		var err error
+		q.WebServerURL, err = url.Parse(uri)
+		if err != nil {
+			return fmt.Errorf("failed to parse quoteweb_url", err)
+		}
+
+		if len(q.WebAuth) != 0 {
+			splits := strings.SplitN(q.WebAuth, ":", 2)
+			if len(splits) != 2 {
+				return fmt.Errorf("failed to split quoteweb_auth into two parts")
+			}
+
+			q.WebServerURL.User = url.UserPassword(splits[0], splits[1])
+		}
+	}
+
+	qdb, err := quotes.OpenDB("quotes.sqlite3", q.WebAuth)
 	if err != nil {
 		return err
 	}
 
 	q.db = qdb
-	qdb.StartServer(q.Listen)
+	if len(q.WebListen) != 0 {
+		qdb.StartServer(q.WebListen)
+	}
 
 	q.quoteID, err = b.RegisterCmd("", "", cmd.New(
 		"quote",
@@ -315,11 +342,11 @@ func (q *Quoter) Info(w irc.Writer, ev *cmd.Event) error {
 
 // Quoteweb provides a server to see the quotes
 func (q *Quoter) Quoteweb(w irc.Writer, ev *cmd.Event) error {
-	if len(q.ServerURI) == 0 {
+	if q.WebServerURL == nil {
 		w.Notify(ev.Event, ev.Nick(), "\x02Quote:\x02 No quote server running")
 		return nil
 	}
-	w.Notify(ev.Event, ev.Nick(), "\x02Quote:\x02 "+q.ServerURI)
+	w.Notify(ev.Event, ev.Nick(), "\x02Quote:\x02 "+q.WebServerURL.String())
 	return nil
 }
 
