@@ -14,6 +14,8 @@ github.com/aarondl/quotes v0.0.0-20200505020105-2b1111cb1e47 h1:e/PsKbMEy7RtzlOM
 github.com/aarondl/quotes v0.0.0-20200505020105-2b1111cb1e47/go.mod h1:Lb2F+wCRft/cVzoyGt4oLROtjtg/KuhPxPfjVYwO914=
 github.com/aarondl/quotes v0.0.0-20200505174217-49a46ecf5988 h1:HB72aURmqeFuBEWK4PLgZ8CFJCHveg5MKNHQjG/gOZo=
 github.com/aarondl/quotes v0.0.0-20200505174217-49a46ecf5988/go.mod h1:Lb2F+wCRft/cVzoyGt4oLROtjtg/KuhPxPfjVYwO914=
+github.com/aarondl/quotes v0.0.0-20200513161851-60831de929e1 h1:w3PsDrMnNCcMbpJQfmP2gynHODSo6njabo84x6JxmjA=
+github.com/aarondl/quotes v0.0.0-20200513161851-60831de929e1/go.mod h1:Lb2F+wCRft/cVzoyGt4oLROtjtg/KuhPxPfjVYwO914=
 github.com/aarondl/ultimateq v0.0.0-20190718005121-c8d92ea565f1 h1:vqImKS5UCX8E+puhJTs3STY4BWmj0qG9lENZ3E6jtm0=
 github.com/aarondl/ultimateq v0.0.0-20190718005121-c8d92ea565f1/go.mod h1:HI1k+w4bk7fKsRWiXG5S2x7uBh6wOUiFUNT0K5f5/a0=
 github.com/aarondl/ultimateq v0.0.0-20190910020858-27f5e6591bb4 h1:0ycATxzKN3Apg6obFdfz0yc5h2yuU4btO7//j2cw5L0=
