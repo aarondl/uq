@@ -118,7 +118,7 @@ func (q *Quoter) Init(b *bot.Bot) error {
 		"addquote",
 		"Adds a quote to the database.",
 		q,
-		cmd.Privmsg, cmd.AnyScope, "quote...",
+		cmd.Privmsg, cmd.Public, "quote...",
 	))
 	if err != nil {
 		return nil
