@@ -325,6 +325,10 @@ func (q *Quoter) Info(w irc.Writer, ev *cmd.Event) error {
 	}
 
 	if quote, err := q.db.GetQuote(int(id)); err != nil {
+		if err == sql.ErrNoRows {
+			w.Notice(nick, "\x02Quote:\x02 Does not exist.")
+			return nil
+		}
 		w.Noticef(nick, "\x02Quote:\x02 error %v", err)
 	} else {
 		w.Notifyf(ev.Event, nick,
